@@ -1,7 +1,5 @@
 # BookFlow — Online Library Management System
 
-![BookFlow Banner](./banner.png)
-
 > "Manage Knowledge, Not Chaos" — A scalable, role-based library management platform with secure authentication, book tracking, and administrative control.
 
 [![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge\&logo=html5\&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/HTML)
@@ -10,6 +8,8 @@
 [![Spring Boot](https://img.shields.io/badge/SpringBoot-6DB33F?style=for-the-badge\&logo=spring-boot\&logoColor=white)](https://spring.io/projects/spring-boot)
 [![MySQL](https://img.shields.io/badge/MySQL-00758F?style=for-the-badge\&logo=mysql\&logoColor=white)](https://www.mysql.com)
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
+
+![BookFlow Banner](./banner.png)
 
 ---
 
