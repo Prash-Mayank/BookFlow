@@ -1,4 +1,4 @@
-# BookFlow — Online Library Management System
+# BookFlow : Online Library Management System
 
 > "Manage Knowledge, Not Chaos" — A scalable, role-based library management platform with secure authentication, book tracking, and administrative control.
 
