@@ -5,14 +5,6 @@ import com.bookflow.exception.BookFlowException;
 
 import java.util.regex.Pattern;
 
-/**
- * Validates passwords according to role-specific complexity rules
- * defined in the Implementation Plan:
- *
- *   Admin (ADM)     : 8+ chars, 1 uppercase, 1 special char (!@#$%...)
- *   Librarian (LIB) : 8+ chars, 1 uppercase, 1 number
- *   Student (STU)   : 6+ chars, at least 1 number
- */
 public final class PasswordPolicy {
 
     private static final Pattern UPPERCASE = Pattern.compile("[A-Z]");
@@ -21,10 +13,6 @@ public final class PasswordPolicy {
 
     private PasswordPolicy() {}
 
-    /**
-     * Validates the password against the rule for the given role.
-     * Throws BookFlowException with a user-friendly message if invalid.
-     */
     public static void validate(String password, User.Role role) {
         if (password == null) {
             throw new BookFlowException("Password is required");
@@ -56,7 +44,6 @@ public final class PasswordPolicy {
         }
     }
 
-    /** Returns the BCrypt strength to use for a given role, per spec. */
     public static int bcryptStrengthFor(User.Role role) {
         return switch (role) {
             case ADM, LIB -> 12;
@@ -64,7 +51,6 @@ public final class PasswordPolicy {
         };
     }
 
-    /** Returns a human-readable rule description, used for UI hints. */
     public static String ruleDescriptionFor(User.Role role) {
         return switch (role) {
             case ADM -> "Min 8 characters, 1 uppercase letter, 1 special character";
