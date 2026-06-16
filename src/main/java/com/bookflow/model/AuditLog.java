@@ -4,11 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
 
-/**
- * Security and audit trail.
- * Every login, logout, and critical action (fine waiver, account lock,
- * book delete, etc.) is recorded here with actor, timestamp, and IP.
- */
 @Entity
 @Table(name = "audit_log", indexes = {
         @Index(name = "idx_audit_user",   columnList = "user_id"),
@@ -61,9 +56,12 @@ public class AuditLog {
         FINE_PAID,
         FINE_WAIVED,
         BOOK_ADDED,
+        BOOK_UPDATED,
         BOOK_DELETED,
         MEMBER_CREATED,
         MEMBER_DELETED,
+        RESERVATION_CREATED,
+        RESERVATION_FULFILLED,
         REPORT_EXPORTED
     }
 }

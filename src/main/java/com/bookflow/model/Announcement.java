@@ -4,10 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
 
-/**
- * Admin-created system-wide notices shown on dashboards
- * via the Notification bell / Announcements Board.
- */
 @Entity
 @Table(name = "announcements")
 @Data

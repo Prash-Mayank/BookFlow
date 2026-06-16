@@ -5,11 +5,6 @@ import lombok.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-/**
- * Book reservation queue.
- * A student can reserve a book that is currently ISSUED or RESERVED.
- * When a copy becomes available, the librarian fulfils the reservation.
- */
 @Entity
 @Table(name = "reservations", indexes = {
         @Index(name = "idx_rsv_member", columnList = "member_id"),

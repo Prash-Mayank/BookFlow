@@ -5,11 +5,6 @@ import jakarta.validation.constraints.*;
 import lombok.*;
 import java.time.LocalDateTime;
 
-/**
- * Represents all system users: Admin (ADM), Librarian (LIB), Student (STU).
- * system_id is the PRIMARY KEY and login username.
- * Format: FIRSTNAME + 6DIGITS + ROLECODE  e.g. PRIYA095312STU
- */
 @Entity
 @Table(name = "users", indexes = {
         @Index(name = "idx_email", columnList = "email"),
@@ -80,8 +75,6 @@ public class User {
         updatedAt = LocalDateTime.now();
     }
 
-    // ---- Enums ----
-
     public enum Role {
         ADM, LIB, STU;
 
@@ -89,7 +82,6 @@ public class User {
             return this.name();
         }
 
-        /** Display-friendly label */
         public String getDisplayName() {
             return switch (this) {
                 case ADM -> "Administrator";
@@ -102,8 +94,6 @@ public class User {
     public enum UserStatus {
         ACTIVE, LOCKED, INACTIVE
     }
-
-    // ---- Helpers ----
 
     public String getFullName() {
         return firstName + " " + lastName;

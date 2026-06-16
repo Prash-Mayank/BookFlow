@@ -4,11 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
 
-/**
- * System-wide configuration settings stored as key/value pairs.
- * Examples: fine.rate.novel, borrow.limit.student, login.max.attempts
- * Editable by Admin via Fine Config Panel.
- */
 @Entity
 @Table(name = "config")
 @Data

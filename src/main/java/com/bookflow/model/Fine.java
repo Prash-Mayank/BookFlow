@@ -6,11 +6,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-/**
- * Fine record linked to a Transaction.
- * amount = overdue_days × daily_rate + processing_charge (if any)
- * Admin can waive a fine; waiver reason is logged.
- */
 @Entity
 @Table(name = "fines", indexes = {
         @Index(name = "idx_fine_member", columnList = "member_id"),
@@ -81,8 +76,6 @@ public class Fine {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
     }
-
-    // ---- Helpers ----
 
     public boolean isOutstanding() {
         return !paid && !waived;

@@ -5,11 +5,6 @@ import jakarta.validation.constraints.*;
 import lombok.*;
 import java.time.LocalDateTime;
 
-/**
- * Book master catalogue.
- * isbn is the PRIMARY KEY (VARCHAR 13).
- * available is auto-decremented on issue and incremented on return.
- */
 @Entity
 @Table(name = "books", indexes = {
         @Index(name = "idx_title",    columnList = "title"),
@@ -91,7 +86,6 @@ public class Book {
         syncStatus();
     }
 
-    /** Keep status field in sync with available count */
     private void syncStatus() {
         if (available > 0) {
             status = BookStatus.AVAILABLE;
@@ -101,8 +95,6 @@ public class Book {
             }
         }
     }
-
-    // ---- Enums ----
 
     public enum BookCategory {
         NOVEL, TEXTBOOK, REFERENCE, MAGAZINE, BIOGRAPHY, SCIENCE, HISTORY, TECHNOLOGY, OTHER;
@@ -116,20 +108,16 @@ public class Book {
         AVAILABLE, ISSUED, RESERVED
     }
 
-    // ---- Helpers ----
-
     public boolean isAvailable() {
         return available > 0;
     }
 
-    /** Called on book issue — decrements available */
     public void decrementAvailable() {
         if (available <= 0) throw new IllegalStateException("No copies available for: " + isbn);
         available--;
         syncStatus();
     }
 
-    /** Called on book return — increments available */
     public void incrementAvailable() {
         available++;
         syncStatus();

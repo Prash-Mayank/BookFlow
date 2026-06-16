@@ -5,22 +5,15 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
-/**
- * BookFlow — Online Library Management System
- * Project Lead: Mayank Prashar
- *
- * Extends SpringBootServletInitializer to allow WAR deployment
- * on external Apache Tomcat server.
- */
 @SpringBootApplication
-public class BookFlowApplication extends SpringBootServletInitializer {
+public class BookflowApplication extends SpringBootServletInitializer {
 
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        return application.sources(BookFlowApplication.class);
+        return application.sources(BookflowApplication.class);
     }
 
     public static void main(String[] args) {
-        SpringApplication.run(BookFlowApplication.class, args);
+        SpringApplication.run(BookflowApplication.class, args);
     }
 }

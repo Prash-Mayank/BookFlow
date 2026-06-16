@@ -4,11 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
 
-/**
- * Caches Gemini API recommendation responses per student.
- * TTL = 24 hours — refreshed on next login after expiry.
- * Prevents repeated API calls for the same student.
- */
 @Entity
 @Table(name = "ai_cache")
 @Data
@@ -34,7 +29,6 @@ public class AiCache {
         cachedAt = LocalDateTime.now();
     }
 
-    /** Returns true if cache is still valid (within 24 hours) */
     public boolean isValid() {
         return cachedAt != null &&
                 cachedAt.isAfter(LocalDateTime.now().minusHours(24));
