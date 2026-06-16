@@ -8,10 +8,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
-/**
- * Wraps our User entity to satisfy Spring Security's UserDetails contract.
- * Authority is prefixed "ROLE_" + role code, e.g. ROLE_ADM, ROLE_LIB, ROLE_STU.
- */
 public class BookFlowUserDetails implements UserDetails {
 
     private final User user;
