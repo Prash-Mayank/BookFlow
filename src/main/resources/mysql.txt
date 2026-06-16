@@ -1,0 +1,20 @@
+# BookFlow — MySQL Setup Notes
+# ===============================
+# 1. Install MySQL 8.x and start the service.
+# 2. Run schema.sql (in src/main/resources/) once to create the database
+#    and all 9 tables:
+#
+#      mysql -u root -p < src/main/resources/schema.sql
+#
+# 3. Update src/main/resources/application.properties with your
+#    actual MySQL username/password:
+#
+#      spring.datasource.username=root
+#      spring.datasource.password=YOUR_ACTUAL_PASSWORD
+#
+# 4. Default DB name: bookflow_db (created automatically by schema.sql)
+#
+# 5. spring.jpa.hibernate.ddl-auto=update is set so Hibernate will also
+#    auto-create/update tables from the entity classes if schema.sql
+#    hasn't been run yet — but running schema.sql first is recommended
+#    since it seeds default config rows (fine rates, borrow limits, etc).
