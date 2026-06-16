@@ -4,19 +4,12 @@ import com.bookflow.dto.RegistrationRequest;
 import com.bookflow.exception.BookFlowException;
 import com.bookflow.model.User;
 import com.bookflow.service.UserService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-/**
- * Handles authentication-related pages and actions.
- * Actual login POST is intercepted by Spring Security's formLogin filter
- * (configured in SecurityConfig) — this controller serves the views
- * and handles registration.
- */
 @Controller
 @RequestMapping("/auth")
 public class AuthController {

@@ -5,10 +5,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
-/**
- * Single entry point after successful login (Spring Security's
- * defaultSuccessUrl). Redirects each user to their role-specific dashboard.
- */
 @Controller
 public class DashboardController {
 
