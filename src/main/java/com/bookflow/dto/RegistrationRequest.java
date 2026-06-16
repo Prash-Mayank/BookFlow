@@ -7,7 +7,7 @@ import lombok.Data;
 /**
  * Captures registration form input.
  * Password complexity rules are enforced separately per role
- * in UserService, since they differ by role:
+ * in UserService (via PasswordPolicy), since they differ by role:
  *   Admin:     8+ chars, 1 uppercase, 1 special char
  *   Librarian: 8+ chars, 1 uppercase, 1 number
  *   Student:   6+ chars, 1 number
