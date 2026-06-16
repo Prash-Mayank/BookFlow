@@ -11,16 +11,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
-/**
- * Spring Security configuration for BookFlow.
- *
- * Route protection:
- *   /admin/**     → ADM role only
- *   /librarian/** → LIB role only
- *   /student/**   → STU role only
- *   /auth/**      → public (login, register)
- *   /public/**    → public (home, assets)
- */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -31,16 +21,12 @@ public class SecurityConfig {
         this.userDetailsService = userDetailsService;
     }
 
-    // ---- Password Encoder ------------------------------------------
-
     @Bean
     public PasswordEncoder passwordEncoder() {
-        // BCrypt with strength 12 — suitable for all roles
-        // (Student uses strength 10 at registration time via custom method)
+        // Default strength 12 — UserService overrides with role-specific
+        // BCryptPasswordEncoder instances at registration time (10 for Student).
         return new BCryptPasswordEncoder(12);
     }
-
-    // ---- Authentication Provider -----------------------------------
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
@@ -50,16 +36,12 @@ public class SecurityConfig {
         return provider;
     }
 
-    // ---- Security Filter Chain ------------------------------------
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authenticationProvider(authenticationProvider())
 
-                // ---- Route access rules --------------------------------
                 .authorizeHttpRequests(auth -> auth
-                        // Public resources
                         .requestMatchers(
                                 "/",
                                 "/home",
@@ -74,16 +56,13 @@ public class SecurityConfig {
                                 "/favicon.ico"
                         ).permitAll()
 
-                        // Role-specific routes
                         .requestMatchers("/admin/**").hasAuthority("ROLE_ADM")
                         .requestMatchers("/librarian/**").hasAnyAuthority("ROLE_LIB", "ROLE_ADM")
                         .requestMatchers("/student/**").hasAuthority("ROLE_STU")
 
-                        // Any other request requires authentication
                         .anyRequest().authenticated()
                 )
 
-                // ---- Form Login ----------------------------------------
                 .formLogin(form -> form
                         .loginPage("/auth/login")
                         .loginProcessingUrl("/auth/login")
@@ -94,7 +73,6 @@ public class SecurityConfig {
                         .permitAll()
                 )
 
-                // ---- Logout --------------------------------------------
                 .logout(logout -> logout
                         .logoutRequestMatcher(new AntPathRequestMatcher("/auth/logout"))
                         .logoutSuccessUrl("/auth/login?logout=true")
@@ -103,15 +81,10 @@ public class SecurityConfig {
                         .permitAll()
                 )
 
-                // ---- Session Management --------------------------------
                 .sessionManagement(session -> session
-                        .maximumSessions(1)           // One active session per user
+                        .maximumSessions(1)
                         .expiredUrl("/auth/login?expired=true")
-                )
-
-        // ---- CSRF protection (enabled by default in Spring Security) ---
-        // CSRF is ON for all forms — JSP pages include the CSRF token
-        ;
+                );
 
         return http.build();
     }
