@@ -20,13 +20,21 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     @Query("SELECT t FROM Transaction t WHERE t.status = 'ISSUED' AND t.dueDate < CURRENT_DATE")
     List<Transaction> findAllOverdue();
 
+    @Query("SELECT t FROM Transaction t WHERE t.member.systemId = :memberId ORDER BY t.issueDate DESC")
+    List<Transaction> findAllByMemberId(@Param("memberId") String memberId);
+
     @Query("SELECT t FROM Transaction t WHERE t.member.systemId = :memberId AND t.status = 'ISSUED'")
     List<Transaction> findActiveByMember(@Param("memberId") String memberId);
 
     @Query("SELECT t FROM Transaction t WHERE t.status = 'ISSUED' AND t.dueDate = :date")
     List<Transaction> findDueOn(@Param("date") LocalDate date);
 
+    @Query("SELECT t FROM Transaction t WHERE t.status = 'ISSUED' ORDER BY t.dueDate ASC")
+    List<Transaction> findAllCurrentlyIssued();
+
     long countByStatusAndIssueDateBetween(Transaction.TxnStatus status, LocalDate from, LocalDate to);
+
+    long countByIssueDate(LocalDate issueDate);
 
     Optional<Transaction> findByMemberSystemIdAndBookIsbnAndStatus(
             String memberId, String isbn, Transaction.TxnStatus status

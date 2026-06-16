@@ -12,7 +12,6 @@ import java.util.List;
 @Repository
 public interface BookRepository extends JpaRepository<Book, String> {
 
-    /** Real-time AJAX search — title, author, isbn, category */
     @Query("""
         SELECT b FROM Book b
         WHERE LOWER(b.title)    LIKE LOWER(CONCAT('%', :q, '%'))
@@ -32,7 +31,6 @@ public interface BookRepository extends JpaRepository<Book, String> {
 
     long countByAvailableGreaterThan(int available);
 
-    /** Top N most borrowed books by issue count */
     @Query("""
         SELECT b FROM Book b
         JOIN Transaction t ON t.book = b

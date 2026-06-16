@@ -15,6 +15,8 @@ public interface FineRepository extends JpaRepository<Fine, Long> {
 
     List<Fine> findByMemberAndPaidFalseAndWaivedFalse(User member);
 
+    List<Fine> findByMemberOrderByCreatedAtDesc(User member);
+
     Optional<Fine> findByTransactionTxnId(Long txnId);
 
     @Query("SELECT COALESCE(SUM(f.amount), 0) FROM Fine f WHERE f.member = :member AND f.paid = false AND f.waived = false")
@@ -22,6 +24,9 @@ public interface FineRepository extends JpaRepository<Fine, Long> {
 
     @Query("SELECT COALESCE(SUM(f.amount), 0) FROM Fine f WHERE f.paid = true")
     BigDecimal getTotalCollected();
+
+    @Query("SELECT COALESCE(SUM(f.amount), 0) FROM Fine f WHERE f.paid = true AND f.paymentDate BETWEEN :from AND :to")
+    BigDecimal getTotalCollectedBetween(@Param("from") java.time.LocalDate from, @Param("to") java.time.LocalDate to);
 
     boolean existsByMemberAndPaidFalseAndWaivedFalse(User member);
 }

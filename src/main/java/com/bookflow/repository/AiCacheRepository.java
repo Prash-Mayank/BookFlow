@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AiCacheRepository extends JpaRepository<AiCache, String> {
-    // findById(memberId) provided by JpaRepository — used to check cache validity
+
 }
