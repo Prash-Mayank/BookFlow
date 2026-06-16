@@ -5,11 +5,6 @@ import com.bookflow.repository.AuditLogRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Central helper for writing entries to the audit_log table.
- * Called from UserService, IssueReturnService, FineService, etc.
- * IP address / user agent are attached by controllers when available.
- */
 @Service
 public class AuditLogService {
 

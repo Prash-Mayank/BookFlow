@@ -50,6 +50,7 @@ public class CsvExporter {
         );
     }
 
+    /** Exports member (user) list as CSV. */
     public byte[] exportUsers(List<User> users) {
         return write(
                 new String[]{"System ID", "Name", "Role", "Email", "Phone", "Status"},
@@ -59,6 +60,9 @@ public class CsvExporter {
                 )
         );
     }
+
+    // ---- Generic write helper ----
+
     @FunctionalInterface
     private interface RowWriter<T> {
         void write(T item, CSVPrinter printer) throws IOException;
