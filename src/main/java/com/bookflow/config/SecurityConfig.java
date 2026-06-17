@@ -11,19 +11,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
-/**
- * Spring Security configuration for BookFlow.
- *
- * Route protection:
- *   /admin/**     → ADM role only
- *   /librarian/** → LIB role only (ADM may also access)
- *   /student/**   → STU role only
- *   /auth/**      → public (login, register)
- *
- * NOTE: Using AntPathRequestMatcher explicitly (instead of the default
- * MvcRequestMatcher) for every rule, since the implicit Mvc matcher was
- * not resolving correctly against this app's context-path/WAR setup.
- */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -61,8 +48,6 @@ public class SecurityConfig {
                         .requestMatchers(new AntPathRequestMatcher("/auth/register")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/auth/register", "POST")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/auth/forgot-password")).permitAll()
-                        .requestMatchers(new AntPathRequestMatcher("/auth/test")).permitAll()
-                        .requestMatchers(new AntPathRequestMatcher("/auth/bare")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/public/**")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/static/**")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/css/**")).permitAll()
