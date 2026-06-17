@@ -1,3 +1,4 @@
+DROP DATABASE IF EXISTS bookflow_db;
 CREATE DATABASE IF NOT EXISTS bookflow_db
     CHARACTER SET utf8mb4
     COLLATE utf8mb4_unicode_ci;
@@ -5,10 +6,10 @@ CREATE DATABASE IF NOT EXISTS bookflow_db
 USE bookflow_db;
 
 CREATE TABLE IF NOT EXISTS users (
-    system_id           VARCHAR(25)     NOT NULL
+    system_id           VARCHAR(25)     NOT NULL    COMMENT 'FIRSTNAME+6DIGITS+ROLECODE — login username',
     first_name          VARCHAR(50)     NOT NULL,
-    last_name            VARCHAR(50)     NOT NULL,
-    password_hash       VARCHAR(255)    NOT NULL
+    last_name           VARCHAR(50)     NOT NULL,
+    password_hash       VARCHAR(255)    NOT NULL    COMMENT 'BCrypt hash — never plain text',
     role                ENUM('ADM','LIB','STU') NOT NULL,
     email               VARCHAR(100)    NOT NULL,
     phone               VARCHAR(15),
@@ -24,7 +25,6 @@ CREATE TABLE IF NOT EXISTS users (
     INDEX idx_role  (role),
     INDEX idx_status (status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
 -- ============================================================
 -- 2. books — Book master catalogue
 -- ============================================================
