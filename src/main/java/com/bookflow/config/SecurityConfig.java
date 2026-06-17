@@ -11,6 +11,19 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
+/**
+ * Spring Security configuration for BookFlow.
+ *
+ * Route protection:
+ *   /admin/**     → ADM role only
+ *   /librarian/** → LIB role only (ADM may also access)
+ *   /student/**   → STU role only
+ *   /auth/**      → public (login, register)
+ *
+ * NOTE: Using AntPathRequestMatcher explicitly (instead of the default
+ * MvcRequestMatcher) for every rule, since the implicit Mvc matcher was
+ * not resolving correctly against this app's context-path/WAR setup.
+ */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -23,8 +36,6 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        // Default strength 12 — UserService overrides with role-specific
-        // BCryptPasswordEncoder instances at registration time (10 for Student).
         return new BCryptPasswordEncoder(12);
     }
 
@@ -42,23 +53,26 @@ public class SecurityConfig {
                 .authenticationProvider(authenticationProvider())
 
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/",
-                                "/home",
-                                "/auth/login",
-                                "/auth/register",
-                                "/auth/forgot-password",
-                                "/public/**",
-                                "/static/**",
-                                "/css/**",
-                                "/js/**",
-                                "/images/**",
-                                "/favicon.ico"
-                        ).permitAll()
+                        .dispatcherTypeMatchers(jakarta.servlet.DispatcherType.FORWARD, jakarta.servlet.DispatcherType.ERROR).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/home")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/auth/login")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/auth/login", "POST")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/auth/register")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/auth/register", "POST")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/auth/forgot-password")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/auth/test")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/auth/bare")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/public/**")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/static/**")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/css/**")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/js/**")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/images/**")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/favicon.ico")).permitAll()
 
-                        .requestMatchers("/admin/**").hasAuthority("ROLE_ADM")
-                        .requestMatchers("/librarian/**").hasAnyAuthority("ROLE_LIB", "ROLE_ADM")
-                        .requestMatchers("/student/**").hasAuthority("ROLE_STU")
+                        .requestMatchers(new AntPathRequestMatcher("/admin/**")).hasAuthority("ROLE_ADM")
+                        .requestMatchers(new AntPathRequestMatcher("/librarian/**")).hasAnyAuthority("ROLE_LIB", "ROLE_ADM")
+                        .requestMatchers(new AntPathRequestMatcher("/student/**")).hasAuthority("ROLE_STU")
 
                         .anyRequest().authenticated()
                 )

@@ -66,6 +66,15 @@ public class AuthController {
         }
     }
 
+    @GetMapping("/test")
+    @ResponseBody
+    public String testEndpoint() {
+        return "Auth controller is reachable, no JSP involved.";
+    }
+    @GetMapping("/bare")
+    public String barePage() {
+        return "auth/bare";
+    }
     @GetMapping("/forgot-password")
     public String forgotPasswordPage() {
         return "auth/forgot-password";
