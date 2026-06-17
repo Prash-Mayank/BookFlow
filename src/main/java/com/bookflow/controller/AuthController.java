@@ -22,9 +22,9 @@ public class AuthController {
 
     @GetMapping("/login")
     public String loginPage(@RequestParam(value = "error", required = false) String error,
-                            @RequestParam(value = "logout", required = false) String logout,
-                            @RequestParam(value = "expired", required = false) String expired,
-                            Model model) {
+                             @RequestParam(value = "logout", required = false) String logout,
+                             @RequestParam(value = "expired", required = false) String expired,
+                             Model model) {
         if (error != null) {
             model.addAttribute("errorMessage", "Invalid System ID or password.");
         }
@@ -46,10 +46,12 @@ public class AuthController {
 
     @PostMapping("/register")
     public String register(@Valid @ModelAttribute("registrationRequest") RegistrationRequest request,
-                           BindingResult bindingResult,
-                           Model model) {
+                            BindingResult bindingResult,
+                            Model model) {
 
         if (bindingResult.hasErrors()) {
+            String firstError = bindingResult.getAllErrors().get(0).getDefaultMessage();
+            model.addAttribute("errorMessage", firstError);
             model.addAttribute("roles", User.Role.values());
             return "auth/register";
         }
@@ -57,7 +59,7 @@ public class AuthController {
         try {
             User newUser = userService.register(request);
             model.addAttribute("successMessage",
-                    "Account created! Your System ID is: " + newUser.getSystemId() + ". Please log in.");
+                "Account created! Your System ID is: " + newUser.getSystemId() + ". Please log in.");
             return "auth/login";
         } catch (BookFlowException ex) {
             model.addAttribute("errorMessage", ex.getMessage());

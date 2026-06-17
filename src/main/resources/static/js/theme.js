@@ -20,9 +20,11 @@
   function applyTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
     document.querySelectorAll('[data-theme-toggle]').forEach(function (toggle) {
-      const thumb = toggle.querySelector('.theme-toggle__thumb');
-      if (thumb) {
-        thumb.textContent = theme === 'dark' ? '🌙' : '☀️';
+      const sunIcon = toggle.querySelector('.icon-sun');
+      const moonIcon = toggle.querySelector('.icon-moon');
+      if (sunIcon && moonIcon) {
+        sunIcon.style.display = theme === 'dark' ? 'none' : 'block';
+        moonIcon.style.display = theme === 'dark' ? 'block' : 'none';
       }
       toggle.setAttribute('aria-checked', theme === 'dark' ? 'true' : 'false');
     });
@@ -46,6 +48,7 @@
   initTheme();
 
   document.addEventListener('DOMContentLoaded', function () {
+    initTheme(); // re-apply once DOM is ready so icon elements definitely exist
     document.querySelectorAll('[data-theme-toggle]').forEach(function (toggle) {
       toggle.addEventListener('click', toggleTheme);
       toggle.addEventListener('keydown', function (e) {

@@ -194,7 +194,7 @@ html[data-theme='dark'] .theme-toggle__track {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
+  color: var(--brand-blue);
   transition: transform var(--transition);
 }
 
@@ -729,7 +729,8 @@ html[data-theme='dark'] .stat-card__link {
   top: 50%;
   transform: translateY(-50%);
   color: var(--text-muted);
-  font-size: 14px;
+  display: flex;
+  align-items: center;
   pointer-events: none;
 }
 
@@ -764,8 +765,13 @@ html[data-theme='dark'] .form-input:focus {
   background: none;
   border: none;
   color: var(--text-muted);
-  font-size: 13px;
   padding: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.form-input-toggle:hover {
+  color: var(--text-primary);
 }
 
 .form-row {
@@ -826,6 +832,15 @@ html[data-theme='dark'] .form-link {
   border-top: 1px solid var(--border-color);
   font-size: 12.5px;
   color: var(--text-muted);
+}
+
+.auth-page__secure-note span {
+  color: var(--brand-blue);
+  flex-shrink: 0;
+}
+
+html[data-theme='dark'] .auth-page__secure-note span {
+  color: var(--brand-green);
 }
 
 .auth-page__secure-note strong {
