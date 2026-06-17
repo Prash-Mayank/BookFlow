@@ -1,14 +1,12 @@
-DROP DATABASE IF EXISTS bookflow_db;
-CREATE DATABASE IF NOT EXISTS bookflow_db
+=CREATE DATABASE IF NOT EXISTS bookflow_db
     CHARACTER SET utf8mb4
     COLLATE utf8mb4_unicode_ci;
 
 USE bookflow_db;
-
 CREATE TABLE IF NOT EXISTS users (
     system_id           VARCHAR(25)     NOT NULL    COMMENT 'FIRSTNAME+6DIGITS+ROLECODE — login username',
     first_name          VARCHAR(50)     NOT NULL,
-    last_name           VARCHAR(50)     NOT NULL,
+    last_name            VARCHAR(50)     NOT NULL,
     password_hash       VARCHAR(255)    NOT NULL    COMMENT 'BCrypt hash — never plain text',
     role                ENUM('ADM','LIB','STU') NOT NULL,
     email               VARCHAR(100)    NOT NULL,
@@ -25,6 +23,7 @@ CREATE TABLE IF NOT EXISTS users (
     INDEX idx_role  (role),
     INDEX idx_status (status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -- ============================================================
 -- 2. books — Book master catalogue
 -- ============================================================
@@ -185,6 +184,9 @@ CREATE TABLE IF NOT EXISTS announcements (
     INDEX idx_ann_role   (target_role)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- ============================================================
+-- 9. ai_cache — Gemini API recommendation cache (24h TTL)
+-- ============================================================
 CREATE TABLE IF NOT EXISTS ai_cache (
     member_id           VARCHAR(25)     NOT NULL,
     recommendations     JSON            NOT NULL,
@@ -192,6 +194,19 @@ CREATE TABLE IF NOT EXISTS ai_cache (
 
     PRIMARY KEY (member_id),
     FOREIGN KEY fk_ai_member (member_id) REFERENCES users(system_id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE IF NOT EXISTS password_reset_tokens (
+    reset_id             BIGINT          NOT NULL AUTO_INCREMENT,
+    token                VARCHAR(64)     NOT NULL,
+    user_id              VARCHAR(25)     NOT NULL,
+    expires_at           DATETIME        NOT NULL,
+    used_at              DATETIME,
+    created_at           DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (reset_id),
+    UNIQUE KEY uq_prt_token (token),
+    FOREIGN KEY fk_prt_user (user_id) REFERENCES users(system_id) ON DELETE CASCADE,
+    INDEX idx_prt_user (user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 SHOW TABLES;

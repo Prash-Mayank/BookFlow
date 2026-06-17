@@ -10,7 +10,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -48,6 +47,11 @@ public class SecurityConfig {
                         .requestMatchers(new AntPathRequestMatcher("/auth/register")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/auth/register", "POST")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/auth/forgot-password")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/auth/forgot-password", "POST")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/auth/reset-password")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/auth/reset-password", "POST")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/auth/test")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/auth/bare")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/public/**")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/static/**")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/css/**")).permitAll()
