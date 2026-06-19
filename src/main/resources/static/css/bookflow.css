@@ -1863,4 +1863,3 @@ html[data-theme='dark'] .notif-item__icon--gift    { background: rgba(147,51,234
   .books-table__row { grid-template-columns: 36px 1fr auto; }
   .ai-books-row { grid-template-columns: repeat(3, 1fr); }
 }
-

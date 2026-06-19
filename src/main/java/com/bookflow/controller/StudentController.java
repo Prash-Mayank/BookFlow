@@ -34,11 +34,11 @@ public class StudentController {
     private final com.bookflow.util.PdfReceiptGenerator pdfReceiptGenerator;
 
     public StudentController(IssueReturnService issueReturnService,
-                             FineService fineService,
-                             BookService bookService,
-                             ReservationService reservationService,
-                             GeminiService geminiService,
-                             com.bookflow.util.PdfReceiptGenerator pdfReceiptGenerator) {
+                              FineService fineService,
+                              BookService bookService,
+                              ReservationService reservationService,
+                              GeminiService geminiService,
+                              com.bookflow.util.PdfReceiptGenerator pdfReceiptGenerator) {
         this.issueReturnService = issueReturnService;
         this.fineService = fineService;
         this.bookService = bookService;
@@ -55,15 +55,37 @@ public class StudentController {
 
         List<Transaction> borrowed = issueReturnService.getActiveTransactionsForMember(student.getSystemId());
         BigDecimal fineBalance = fineService.getTotalOutstanding(student);
-        JsonNode recommendations = geminiService.getRecommendations(student);
+        JsonNode recommendationsJson = geminiService.getRecommendations(student);
 
         model.addAttribute("user", student);
         model.addAttribute("borrowedBooks", borrowed);
+        model.addAttribute("borrowedCount", borrowed.size());
         model.addAttribute("fineBalance", fineBalance);
-        model.addAttribute("recommendations", recommendations);
+        model.addAttribute("recommendations", toRecommendationList(recommendationsJson));
         model.addAttribute("dueSoonCount", borrowed.stream().filter(Transaction::isDueSoon).count());
+        model.addAttribute("notificationCount", 0);
 
         return "student/dashboard";
+    }
+
+    /**
+     * Converts the Gemini JsonNode response into a list of simple maps,
+     * since JSTL EL cannot navigate Jackson's JsonNode property accessors
+     * directly (${rec.title} would fail to resolve on a raw JsonNode).
+     */
+    private List<java.util.Map<String, String>> toRecommendationList(JsonNode node) {
+        List<java.util.Map<String, String>> list = new java.util.ArrayList<>();
+        if (node != null && node.isArray()) {
+            for (JsonNode item : node) {
+                java.util.Map<String, String> map = new java.util.HashMap<>();
+                map.put("title", item.path("title").asText(""));
+                map.put("author", item.path("author").asText(""));
+                map.put("genre", item.path("genre").asText(""));
+                map.put("reason", item.path("reason").asText(""));
+                list.add(map);
+            }
+        }
+        return list;
     }
 
     /** AI Recommendations widget — lazy-loaded via AJAX if preferred. */
@@ -77,8 +99,8 @@ public class StudentController {
 
     @GetMapping("/books")
     public String browseCatalogue(@RequestParam(required = false) String q,
-                                  @RequestParam(defaultValue = "0") int page,
-                                  Model model) {
+                                   @RequestParam(defaultValue = "0") int page,
+                                   Model model) {
         Page<Book> books = bookService.search(q, PageRequest.of(page, 12));
         model.addAttribute("books", books);
         model.addAttribute("query", q);
@@ -114,8 +136,8 @@ public class StudentController {
 
     @PostMapping("/reserve")
     public String reserveBook(@RequestParam String isbn,
-                              @AuthenticationPrincipal BookFlowUserDetails principal,
-                              Model model) {
+                               @AuthenticationPrincipal BookFlowUserDetails principal,
+                               Model model) {
         try {
             reservationService.reserveBook(principal.getUser(), isbn);
             return "redirect:/student/books?reserved=true";
@@ -139,6 +161,8 @@ public class StudentController {
         return "student/profile";
     }
 
+    // ---- Download borrowing certificate / full receipt (PDF) ----
+
     @GetMapping("/download-receipt")
     public ResponseEntity<ByteArrayResource> downloadBorrowReceipt(
             @AuthenticationPrincipal BookFlowUserDetails principal) {
@@ -152,9 +176,9 @@ public class StudentController {
 
     private ResponseEntity<ByteArrayResource> buildPdfResponse(byte[] data, String filename) {
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
-                .contentType(MediaType.APPLICATION_PDF)
-                .contentLength(data.length)
-                .body(new ByteArrayResource(data));
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+            .contentType(MediaType.APPLICATION_PDF)
+            .contentLength(data.length)
+            .body(new ByteArrayResource(data));
     }
 }
