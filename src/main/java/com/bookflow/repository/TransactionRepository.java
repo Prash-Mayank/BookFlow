@@ -17,19 +17,19 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
     long countByMemberAndStatus(User member, Transaction.TxnStatus status);
 
-    @Query("SELECT t FROM Transaction t WHERE t.status = 'ISSUED' AND t.dueDate < CURRENT_DATE")
+    @Query("SELECT t FROM Transaction t JOIN FETCH t.book JOIN FETCH t.member WHERE t.status = 'ISSUED' AND t.dueDate < CURRENT_DATE ORDER BY t.dueDate ASC")
     List<Transaction> findAllOverdue();
 
-    @Query("SELECT t FROM Transaction t WHERE t.member.systemId = :memberId ORDER BY t.issueDate DESC")
+    @Query("SELECT t FROM Transaction t JOIN FETCH t.book WHERE t.member.systemId = :memberId ORDER BY t.issueDate DESC")
     List<Transaction> findAllByMemberId(@Param("memberId") String memberId);
 
-    @Query("SELECT t FROM Transaction t WHERE t.member.systemId = :memberId AND t.status = 'ISSUED'")
+    @Query("SELECT t FROM Transaction t JOIN FETCH t.book WHERE t.member.systemId = :memberId AND t.status = 'ISSUED'")
     List<Transaction> findActiveByMember(@Param("memberId") String memberId);
 
     @Query("SELECT t FROM Transaction t WHERE t.status = 'ISSUED' AND t.dueDate = :date")
     List<Transaction> findDueOn(@Param("date") LocalDate date);
 
-    @Query("SELECT t FROM Transaction t WHERE t.status = 'ISSUED' ORDER BY t.dueDate ASC")
+    @Query("SELECT t FROM Transaction t JOIN FETCH t.book JOIN FETCH t.member WHERE t.status = 'ISSUED' ORDER BY t.dueDate ASC")
     List<Transaction> findAllCurrentlyIssued();
 
     long countByStatusAndIssueDateBetween(Transaction.TxnStatus status, LocalDate from, LocalDate to);
@@ -37,6 +37,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     long countByIssueDate(LocalDate issueDate);
 
     Optional<Transaction> findByMemberSystemIdAndBookIsbnAndStatus(
-            String memberId, String isbn, Transaction.TxnStatus status
+        String memberId, String isbn, Transaction.TxnStatus status
     );
 }
