@@ -31,9 +31,9 @@ public class AdminController {
     private final FineService fineService;
 
     public AdminController(ReportService reportService,
-                           BookService bookService,
-                           UserService userService,
-                           FineService fineService) {
+                            BookService bookService,
+                            UserService userService,
+                            FineService fineService) {
         this.reportService = reportService;
         this.bookService = bookService;
         this.userService = userService;
@@ -48,6 +48,9 @@ public class AdminController {
         model.addAttribute("stats", stats);
         model.addAttribute("user", principal.getUser());
         model.addAttribute("overdueBooks", reportService.getOverdueBooks());
+        model.addAttribute("librarianCount", userService.getAllByRole(User.Role.LIB).size());
+        model.addAttribute("studentCount", userService.getAllByRole(User.Role.STU).size());
+        model.addAttribute("availableBookCount", bookService.getAvailableBookCount());
         return "admin/dashboard";
     }
 
@@ -69,10 +72,10 @@ public class AdminController {
 
     @PostMapping("/books")
     public String addBook(@Valid @ModelAttribute BookRequest request,
-                          BindingResult bindingResult,
-                          @RequestParam(required = false) MultipartFile coverImage,
-                          @AuthenticationPrincipal BookFlowUserDetails principal,
-                          Model model) {
+                           BindingResult bindingResult,
+                           @RequestParam(required = false) MultipartFile coverImage,
+                           @AuthenticationPrincipal BookFlowUserDetails principal,
+                           Model model) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("books", bookService.getAll());
             model.addAttribute("categories", Book.BookCategory.values());
@@ -91,16 +94,16 @@ public class AdminController {
 
     @PostMapping("/books/{isbn}/edit")
     public String editBook(@PathVariable String isbn,
-                           @Valid @ModelAttribute BookRequest request,
-                           @RequestParam(required = false) MultipartFile coverImage,
-                           @AuthenticationPrincipal BookFlowUserDetails principal) {
+                            @Valid @ModelAttribute BookRequest request,
+                            @RequestParam(required = false) MultipartFile coverImage,
+                            @AuthenticationPrincipal BookFlowUserDetails principal) {
         bookService.updateBook(isbn, request, coverImage, principal.getUser().getSystemId());
         return "redirect:/admin/books";
     }
 
     @PostMapping("/books/{isbn}/delete")
     public String deleteBook(@PathVariable String isbn,
-                             @AuthenticationPrincipal BookFlowUserDetails principal) {
+                              @AuthenticationPrincipal BookFlowUserDetails principal) {
         bookService.deleteBook(isbn, principal.getUser().getSystemId());
         return "redirect:/admin/books";
     }
@@ -116,9 +119,9 @@ public class AdminController {
 
     @PostMapping("/users/{systemId}/reset-password")
     public String resetPassword(@PathVariable String systemId,
-                                @RequestParam String newPassword,
-                                @AuthenticationPrincipal BookFlowUserDetails principal,
-                                Model model) {
+                                 @RequestParam String newPassword,
+                                 @AuthenticationPrincipal BookFlowUserDetails principal,
+                                 Model model) {
         try {
             userService.resetPassword(systemId, newPassword, principal.getUser().getSystemId());
         } catch (BookFlowException ex) {
@@ -131,8 +134,8 @@ public class AdminController {
 
     @PostMapping("/fines/{fineId}/waive")
     public String waiveFine(@PathVariable Long fineId,
-                            @RequestParam String reason,
-                            @AuthenticationPrincipal BookFlowUserDetails principal) {
+                             @RequestParam String reason,
+                             @AuthenticationPrincipal BookFlowUserDetails principal) {
         fineService.waiveFine(fineId, reason, principal.getUser().getSystemId());
         return "redirect:/admin/dashboard";
     }
@@ -164,9 +167,9 @@ public class AdminController {
 
     private ResponseEntity<ByteArrayResource> buildFileResponse(byte[] data, String filename, MediaType type) {
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
-                .contentType(type)
-                .contentLength(data.length)
-                .body(new ByteArrayResource(data));
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+            .contentType(type)
+            .contentLength(data.length)
+            .body(new ByteArrayResource(data));
     }
 }
