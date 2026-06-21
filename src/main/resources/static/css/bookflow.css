@@ -1863,3 +1863,247 @@ html[data-theme='dark'] .notif-item__icon--gift    { background: rgba(147,51,234
   .books-table__row { grid-template-columns: 36px 1fr auto; }
   .ai-books-row { grid-template-columns: repeat(3, 1fr); }
 }
+
+/* ============================================================
+   Admin Management Pages — Books / Users tables, modals
+   ============================================================ */
+
+.mgmt-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.mgmt-page-header__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 20px;
+  color: var(--text-primary);
+  margin: 0 0 4px 0;
+}
+
+.mgmt-page-header__subtitle {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.btn-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 18px;
+  background: var(--brand-blue);
+  color: #fff;
+  font-weight: 600;
+  font-size: 13.5px;
+  border: none;
+  border-radius: var(--radius-sm);
+  transition: background var(--transition);
+}
+
+.btn-add:hover { background: var(--brand-blue-dark); }
+
+html[data-theme='dark'] .btn-add { background: var(--brand-green); }
+html[data-theme='dark'] .btn-add:hover { background: #15803d; }
+
+/* ---- Data table (generic) ---- */
+
+.data-table-wrap {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table thead th {
+  text-align: left;
+  font-size: 11.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+  padding: 12px 16px;
+  background: var(--bg-surface-alt);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.data-table tbody td {
+  padding: 12px 16px;
+  font-size: 13.5px;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-color);
+  vertical-align: middle;
+}
+
+.data-table tbody tr:last-child td { border-bottom: none; }
+.data-table tbody tr:hover { background: var(--bg-surface-alt); }
+
+.data-table__cover {
+  width: 32px;
+  height: 44px;
+  border-radius: 4px;
+  object-fit: cover;
+  background: var(--bg-surface-alt);
+  border: 1px solid var(--border-color);
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+.status-badge--available { background: #f0fdf4; color: #16a34a; }
+.status-badge--issued    { background: #fffbeb; color: #d97706; }
+.status-badge--reserved  { background: #eff6ff; color: #2563eb; }
+.status-badge--locked    { background: #fef2f2; color: #dc2626; }
+.status-badge--active    { background: #f0fdf4; color: #16a34a; }
+
+html[data-theme='dark'] .status-badge--available { background: rgba(22,163,74,0.12); color: #86efac; }
+html[data-theme='dark'] .status-badge--issued    { background: rgba(217,119,6,0.12); color: #fcd34d; }
+html[data-theme='dark'] .status-badge--reserved   { background: rgba(37,99,235,0.12); color: #93c5fd; }
+html[data-theme='dark'] .status-badge--locked     { background: rgba(220,38,38,0.12); color: #fca5a5; }
+html[data-theme='dark'] .status-badge--active     { background: rgba(22,163,74,0.12); color: #86efac; }
+
+.table-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.table-action-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color var(--transition), color var(--transition);
+}
+
+.table-action-btn:hover { border-color: var(--brand-blue); color: var(--brand-blue); }
+.table-action-btn--danger:hover { border-color: #dc2626; color: #dc2626; }
+
+/* ---- Modal ---- */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 20px;
+}
+
+.modal-overlay--open { display: flex; }
+
+.modal-box {
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  max-width: 560px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 24px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+}
+
+.modal-box__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.modal-box__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 17px;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.modal-box__close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  padding: 4px;
+  border-radius: 6px;
+  display: flex;
+}
+
+.modal-box__close:hover { background: var(--bg-surface-alt); color: var(--text-primary); }
+
+/* ---- Search/filter bar ---- */
+
+.mgmt-toolbar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+  align-items: center;
+}
+
+.mgmt-toolbar__search {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 9px 14px;
+}
+
+.mgmt-toolbar__search input {
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 13.5px;
+  font-family: inherit;
+  flex: 1;
+  outline: none;
+}
+
+.mgmt-toolbar__select {
+  padding: 9px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  font-size: 13.5px;
+  font-family: inherit;
+}
+
+.empty-state {
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13.5px;
+}
+
+.file-input-wrap {
+  border: 1.5px dashed var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color var(--transition);
+}
+
+.file-input-wrap:hover { border-color: var(--brand-blue); }
+
+.file-input-wrap input[type="file"] { display: none; }
