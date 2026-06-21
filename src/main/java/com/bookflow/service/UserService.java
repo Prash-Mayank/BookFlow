@@ -25,8 +25,8 @@ public class UserService {
     private final AuditLogService auditLogService;
 
     public UserService(UserRepository userRepository,
-                       SystemIdGenerator systemIdGenerator,
-                       AuditLogService auditLogService) {
+                        SystemIdGenerator systemIdGenerator,
+                        AuditLogService auditLogService) {
         this.userRepository = userRepository;
         this.systemIdGenerator = systemIdGenerator;
         this.auditLogService = auditLogService;
@@ -50,25 +50,25 @@ public class UserService {
         String systemId = systemIdGenerator.generate(request.getFirstName(), request.getRole());
 
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(
-                PasswordPolicy.bcryptStrengthFor(request.getRole())
+            PasswordPolicy.bcryptStrengthFor(request.getRole())
         );
         String hash = encoder.encode(request.getPassword());
 
         User user = User.builder()
-                .systemId(systemId)
-                .firstName(request.getFirstName().trim())
-                .lastName(request.getLastName().trim())
-                .email(request.getEmail().trim().toLowerCase())
-                .phone(request.getPhone())
-                .role(request.getRole())
-                .passwordHash(hash)
-                .status(User.UserStatus.ACTIVE)
-                .build();
+            .systemId(systemId)
+            .firstName(request.getFirstName().trim())
+            .lastName(request.getLastName().trim())
+            .email(request.getEmail().trim().toLowerCase())
+            .phone(request.getPhone())
+            .role(request.getRole())
+            .passwordHash(hash)
+            .status(User.UserStatus.ACTIVE)
+            .build();
 
         userRepository.save(user);
 
         auditLogService.log(systemId, AuditLog.AuditAction.MEMBER_CREATED,
-                "New " + request.getRole().getDisplayName() + " account registered: " + systemId);
+            "New " + request.getRole().getDisplayName() + " account registered: " + systemId);
 
         return user;
     }
@@ -86,13 +86,13 @@ public class UserService {
             user.setStatus(User.UserStatus.LOCKED);
             userRepository.save(user);
             auditLogService.log(systemId, AuditLog.AuditAction.ACCOUNT_LOCKED,
-                    "Account locked after " + attempts + " failed login attempts");
+                "Account locked after " + attempts + " failed login attempts");
         } else {
             userRepository.save(user);
         }
 
         auditLogService.log(systemId, AuditLog.AuditAction.LOGIN_FAILED,
-                "Failed login attempt #" + attempts);
+            "Failed login attempt #" + attempts);
     }
 
     @Transactional
@@ -104,12 +104,12 @@ public class UserService {
     @Transactional
     public void resetPassword(String targetSystemId, String newPassword, String resetByAdminId) {
         User target = userRepository.findById(targetSystemId)
-                .orElseThrow(() -> new BookFlowException("User not found: " + targetSystemId));
+            .orElseThrow(() -> new BookFlowException("User not found: " + targetSystemId));
 
         PasswordPolicy.validate(newPassword, target.getRole());
 
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(
-                PasswordPolicy.bcryptStrengthFor(target.getRole())
+            PasswordPolicy.bcryptStrengthFor(target.getRole())
         );
         target.setPasswordHash(encoder.encode(newPassword));
         target.setFailedLoginAttempts(0);
@@ -117,17 +117,57 @@ public class UserService {
         userRepository.save(target);
 
         auditLogService.log(resetByAdminId, AuditLog.AuditAction.PASSWORD_RESET,
-                "Password reset for " + targetSystemId + " by " + resetByAdminId);
+            "Password reset for " + targetSystemId + " by " + resetByAdminId);
     }
 
     @Transactional(readOnly = true)
     public User getBySystemId(String systemId) {
         return userRepository.findById(systemId)
-                .orElseThrow(() -> new BookFlowException("User not found: " + systemId));
+            .orElseThrow(() -> new BookFlowException("User not found: " + systemId));
     }
 
     @Transactional(readOnly = true)
     public java.util.List<User> getAllByRole(User.Role role) {
         return userRepository.findByRole(role);
+    }
+
+    @Transactional(readOnly = true)
+    public java.util.List<User> getAll() {
+        return userRepository.findAll();
+    }
+
+    /** Admin deletes a Librarian or Student account. Admin accounts cannot be self-deleted via this method. */
+    @Transactional
+    public void deleteUser(String targetSystemId, String deletedByAdminId) {
+        User target = userRepository.findById(targetSystemId)
+            .orElseThrow(() -> new BookFlowException("User not found: " + targetSystemId));
+
+        if (target.getSystemId().equals(deletedByAdminId)) {
+            throw new BookFlowException("You cannot delete your own account");
+        }
+
+        userRepository.delete(target);
+
+        auditLogService.log(deletedByAdminId, AuditLog.AuditAction.MEMBER_DELETED,
+            "Deleted account: " + targetSystemId + " (" + target.getRole().getDisplayName() + ")");
+    }
+
+    /** Toggles a user's account between ACTIVE and LOCKED, resetting failed-attempt counter on unlock. */
+    @Transactional
+    public void toggleLock(String targetSystemId, String actingAdminId) {
+        User target = userRepository.findById(targetSystemId)
+            .orElseThrow(() -> new BookFlowException("User not found: " + targetSystemId));
+
+        if (target.getStatus() == User.UserStatus.LOCKED) {
+            target.setStatus(User.UserStatus.ACTIVE);
+            target.setFailedLoginAttempts(0);
+            auditLogService.log(actingAdminId, AuditLog.AuditAction.LOGIN,
+                "Account unlocked by admin: " + targetSystemId);
+        } else {
+            target.setStatus(User.UserStatus.LOCKED);
+            auditLogService.log(actingAdminId, AuditLog.AuditAction.ACCOUNT_LOCKED,
+                "Account manually locked by admin: " + targetSystemId);
+        }
+        userRepository.save(target);
     }
 }

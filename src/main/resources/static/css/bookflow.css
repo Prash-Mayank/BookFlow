@@ -2107,3 +2107,54 @@ html[data-theme='dark'] .status-badge--active     { background: rgba(22,163,74,0
 .file-input-wrap:hover { border-color: var(--brand-blue); }
 
 .file-input-wrap input[type="file"] { display: none; }
+
+/* ============================================================
+   User Management Tabs
+   ============================================================ */
+
+.user-tab {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 16px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color var(--transition), border-color var(--transition);
+}
+
+.user-tab:hover {
+  color: var(--text-primary);
+}
+
+.user-tab--active {
+  color: var(--brand-blue);
+  border-bottom-color: var(--brand-blue);
+}
+
+html[data-theme='dark'] .user-tab--active {
+  color: var(--brand-green);
+  border-bottom-color: var(--brand-green);
+}
+
+.user-tab__count {
+  background: var(--bg-surface-alt);
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 99px;
+}
+
+.user-tab--active .user-tab__count {
+  background: var(--brand-blue);
+  color: #fff;
+}
+
+html[data-theme='dark'] .user-tab--active .user-tab__count {
+  background: var(--brand-green);
+}

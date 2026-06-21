@@ -114,6 +114,7 @@ public class AdminController {
     public String listUsers(Model model) {
         model.addAttribute("students", userService.getAllByRole(User.Role.STU));
         model.addAttribute("librarians", userService.getAllByRole(User.Role.LIB));
+        model.addAttribute("admins", userService.getAllByRole(User.Role.ADM));
         return "admin/users";
     }
 
@@ -127,6 +128,28 @@ public class AdminController {
         } catch (BookFlowException ex) {
             model.addAttribute("errorMessage", ex.getMessage());
         }
+        return "redirect:/admin/users";
+    }
+
+    @PostMapping("/users/{systemId}/delete")
+    public String deleteUser(@PathVariable String systemId,
+                              @AuthenticationPrincipal BookFlowUserDetails principal,
+                              org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        try {
+            userService.deleteUser(systemId, principal.getUser().getSystemId());
+        } catch (BookFlowException ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+        } catch (org.springframework.dao.DataIntegrityViolationException ex) {
+            redirectAttributes.addFlashAttribute("errorMessage",
+                "Cannot delete this account — it has existing borrow/fine history. Lock the account instead.");
+        }
+        return "redirect:/admin/users";
+    }
+
+    @PostMapping("/users/{systemId}/toggle-lock")
+    public String toggleLock(@PathVariable String systemId,
+                              @AuthenticationPrincipal BookFlowUserDetails principal) {
+        userService.toggleLock(systemId, principal.getUser().getSystemId());
         return "redirect:/admin/users";
     }
 
