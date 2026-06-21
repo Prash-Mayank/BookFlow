@@ -13,6 +13,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * Core library workflow: issue, return, and the checks that gate them
+ * (borrow limit, unpaid fines, book availability).
+ *
+ * Maps to Implementation Plan §4.2 (Issue & Return Workflow) and
+ * Weeks 7-8 (Issue, Return & Fine Engine).
+ */
 @Service
 public class IssueReturnService {
 
@@ -30,11 +37,11 @@ public class IssueReturnService {
     private final AuditLogService auditLogService;
 
     public IssueReturnService(TransactionRepository transactionRepository,
-                              UserRepository userRepository,
-                              FineRepository fineRepository,
-                              BookService bookService,
-                              FineService fineService,
-                              AuditLogService auditLogService) {
+                               UserRepository userRepository,
+                               FineRepository fineRepository,
+                               BookService bookService,
+                               FineService fineService,
+                               AuditLogService auditLogService) {
         this.transactionRepository = transactionRepository;
         this.userRepository = userRepository;
         this.fineRepository = fineRepository;
@@ -52,7 +59,7 @@ public class IssueReturnService {
     public Transaction issueBook(IssueBookRequest request, String issuedByLibrarianId) {
 
         User member = userRepository.findById(request.getMemberId())
-                .orElseThrow(() -> new BookFlowException("Member not found: " + request.getMemberId()));
+            .orElseThrow(() -> new BookFlowException("Member not found: " + request.getMemberId()));
 
         if (!member.isActive()) {
             throw new BookFlowException("Member account is " + member.getStatus() + " — cannot issue book");
@@ -60,14 +67,14 @@ public class IssueReturnService {
 
         Book book = bookService.getByIsbn(request.getIsbn());
 
-        if (!book.isAvailable()) {
+        if (!book.hasAvailableCopies()) {
             throw new BookFlowException("No copies available for: " + book.getTitle());
         }
 
         long activeCount = transactionRepository.countByMemberAndStatus(member, Transaction.TxnStatus.ISSUED);
         if (activeCount >= borrowLimit) {
             throw new BookFlowException(
-                    "Member has reached the borrow limit (" + borrowLimit + " books). Return a book before issuing another."
+                "Member has reached the borrow limit (" + borrowLimit + " books). Return a book before issuing another."
             );
         }
 
@@ -80,19 +87,19 @@ public class IssueReturnService {
         LocalDate dueDate = issueDate.plusDays(borrowDurationDays);
 
         Transaction txn = Transaction.builder()
-                .member(member)
-                .book(book)
-                .issueDate(issueDate)
-                .dueDate(dueDate)
-                .status(Transaction.TxnStatus.ISSUED)
-                .issuedBy(issuedByLibrarianId)
-                .build();
+            .member(member)
+            .book(book)
+            .issueDate(issueDate)
+            .dueDate(dueDate)
+            .status(Transaction.TxnStatus.ISSUED)
+            .issuedBy(issuedByLibrarianId)
+            .build();
 
         transactionRepository.save(txn);
         bookService.decrementStock(book.getIsbn());
 
         auditLogService.log(issuedByLibrarianId, AuditLog.AuditAction.BOOK_ISSUED,
-                "Issued '" + book.getTitle() + "' to " + member.getSystemId() + ", due " + dueDate);
+            "Issued '" + book.getTitle() + "' to " + member.getSystemId() + ", due " + dueDate);
 
         return txn;
     }
@@ -105,7 +112,7 @@ public class IssueReturnService {
     public Transaction returnBook(Long txnId, String returnedByLibrarianId) {
 
         Transaction txn = transactionRepository.findById(txnId)
-                .orElseThrow(() -> new BookFlowException("Transaction not found: " + txnId));
+            .orElseThrow(() -> new BookFlowException("Transaction not found: " + txnId));
 
         if (txn.getStatus() == Transaction.TxnStatus.RETURNED) {
             throw new BookFlowException("This book has already been returned");
@@ -121,15 +128,15 @@ public class IssueReturnService {
 
         // Auto-calculate fine if overdue
         long overdueDays = Math.max(0,
-                java.time.temporal.ChronoUnit.DAYS.between(txn.getDueDate(), returnDate));
+            java.time.temporal.ChronoUnit.DAYS.between(txn.getDueDate(), returnDate));
 
         if (overdueDays > 0) {
             fineService.createFineForTransaction(txn, overdueDays);
         }
 
         auditLogService.log(returnedByLibrarianId, AuditLog.AuditAction.BOOK_RETURNED,
-                "Returned '" + txn.getBook().getTitle() + "' from " + txn.getMember().getSystemId()
-                        + (overdueDays > 0 ? " (" + overdueDays + " days overdue)" : " (on time)"));
+            "Returned '" + txn.getBook().getTitle() + "' from " + txn.getMember().getSystemId()
+                + (overdueDays > 0 ? " (" + overdueDays + " days overdue)" : " (on time)"));
 
         return txn;
     }
@@ -138,9 +145,9 @@ public class IssueReturnService {
     @Transactional(readOnly = true)
     public long previewOverdueDays(Long txnId) {
         Transaction txn = transactionRepository.findById(txnId)
-                .orElseThrow(() -> new BookFlowException("Transaction not found: " + txnId));
+            .orElseThrow(() -> new BookFlowException("Transaction not found: " + txnId));
         return Math.max(0,
-                java.time.temporal.ChronoUnit.DAYS.between(txn.getDueDate(), LocalDate.now()));
+            java.time.temporal.ChronoUnit.DAYS.between(txn.getDueDate(), LocalDate.now()));
     }
 
     @Transactional(readOnly = true)

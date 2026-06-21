@@ -7,9 +7,9 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "books", indexes = {
-        @Index(name = "idx_title",    columnList = "title"),
-        @Index(name = "idx_author",   columnList = "author"),
-        @Index(name = "idx_category", columnList = "category")
+    @Index(name = "idx_title",    columnList = "title"),
+    @Index(name = "idx_author",   columnList = "author"),
+    @Index(name = "idx_category", columnList = "category")
 })
 @Data
 @NoArgsConstructor
@@ -108,7 +108,7 @@ public class Book {
         AVAILABLE, ISSUED, RESERVED
     }
 
-    public boolean isAvailable() {
+    public boolean hasAvailableCopies() {
         return available > 0;
     }
 

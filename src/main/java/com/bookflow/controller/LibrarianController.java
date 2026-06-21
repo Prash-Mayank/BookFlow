@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+
 @Controller
 @RequestMapping("/librarian")
 public class LibrarianController {
@@ -32,9 +33,9 @@ public class LibrarianController {
     private final ReservationService reservationService;
 
     public LibrarianController(IssueReturnService issueReturnService,
-                               BookService bookService,
-                               FineService fineService,
-                               ReservationService reservationService) {
+                                BookService bookService,
+                                FineService fineService,
+                                ReservationService reservationService) {
         this.issueReturnService = issueReturnService;
         this.bookService = bookService;
         this.fineService = fineService;
@@ -57,9 +58,9 @@ public class LibrarianController {
 
     @PostMapping("/issue")
     public String issueBook(@Valid @ModelAttribute IssueBookRequest request,
-                            BindingResult bindingResult,
-                            @AuthenticationPrincipal BookFlowUserDetails principal,
-                            Model model) {
+                             BindingResult bindingResult,
+                             @AuthenticationPrincipal BookFlowUserDetails principal,
+                             Model model) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("errorMessage", "Please provide both Member ID and ISBN");
             return "redirect:/librarian/dashboard";
@@ -80,9 +81,9 @@ public class LibrarianController {
         try {
             Book book = bookService.getByIsbn(isbn);
             return Map.of(
-                    "available", book.isAvailable(),
-                    "bookTitle", book.getTitle(),
-                    "copiesLeft", book.getAvailable()
+                "available", book.hasAvailableCopies(),
+                "bookTitle", book.getTitle(),
+                "copiesLeft", book.getAvailable()
             );
         } catch (BookFlowException ex) {
             return Map.of("error", ex.getMessage());
@@ -93,8 +94,8 @@ public class LibrarianController {
 
     @PostMapping("/return")
     public String returnBook(@RequestParam Long txnId,
-                             @AuthenticationPrincipal BookFlowUserDetails principal,
-                             Model model) {
+                              @AuthenticationPrincipal BookFlowUserDetails principal,
+                              Model model) {
         try {
             issueReturnService.returnBook(txnId, principal.getUser().getSystemId());
             return "redirect:/librarian/dashboard?returned=true";
@@ -117,8 +118,8 @@ public class LibrarianController {
     @GetMapping("/books/search")
     @ResponseBody
     public Page<Book> searchBooks(@RequestParam(required = false) String q,
-                                  @RequestParam(defaultValue = "0") int page,
-                                  @RequestParam(defaultValue = "10") int size) {
+                                   @RequestParam(defaultValue = "0") int page,
+                                   @RequestParam(defaultValue = "10") int size) {
         return bookService.search(q, PageRequest.of(page, size));
     }
 
@@ -126,7 +127,7 @@ public class LibrarianController {
 
     @PostMapping("/reservations/{rsvId}/fulfill")
     public String fulfillReservation(@PathVariable Long rsvId,
-                                     @AuthenticationPrincipal BookFlowUserDetails principal) {
+                                      @AuthenticationPrincipal BookFlowUserDetails principal) {
         reservationService.fulfillReservation(rsvId, principal.getUser().getSystemId());
         return "redirect:/librarian/dashboard";
     }
@@ -135,8 +136,8 @@ public class LibrarianController {
 
     @PostMapping("/fines/{fineId}/pay")
     public String payFine(@PathVariable Long fineId,
-                          @RequestParam String paymentMode,
-                          @AuthenticationPrincipal BookFlowUserDetails principal) {
+                           @RequestParam String paymentMode,
+                           @AuthenticationPrincipal BookFlowUserDetails principal) {
         fineService.payFine(fineId, paymentMode, principal.getUser().getSystemId());
         return "redirect:/librarian/dashboard?finePaid=true";
     }
@@ -145,11 +146,14 @@ public class LibrarianController {
     public ResponseEntity<ByteArrayResource> downloadReceipt(@PathVariable Long fineId) {
         byte[] pdf = fineService.generateReceiptPdf(fineId);
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"receipt-" + fineId + ".pdf\"")
-                .contentType(MediaType.APPLICATION_PDF)
-                .contentLength(pdf.length)
-                .body(new ByteArrayResource(pdf));
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"receipt-" + fineId + ".pdf\"")
+            .contentType(MediaType.APPLICATION_PDF)
+            .contentLength(pdf.length)
+            .body(new ByteArrayResource(pdf));
     }
+
+    // ---- Daily Activity Log ----
+
     @GetMapping("/activity")
     public String dailyActivity(Model model) {
         model.addAttribute("currentlyIssued", issueReturnService.getAllCurrentlyIssued());
